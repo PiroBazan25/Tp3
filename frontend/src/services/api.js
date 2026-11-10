@@ -1,4 +1,7 @@
 export async function api(ruta, { metodo = 'GET', datos, token, signal } = {}) {
+    if (window.location.protocol !== 'https:') {
+        throw new Error('Abrí la aplicación con HTTPS para proteger tus datos.');
+    }
     let respuesta;
     try {
         respuesta = await fetch(`/api${ruta}`, {

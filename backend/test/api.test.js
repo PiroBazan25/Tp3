@@ -5,6 +5,9 @@ import { randomBytes } from 'node:crypto';
 import mysql from 'mysql2/promise';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import https from 'node:https';
+import http from 'node:http';
+import selfsigned from 'selfsigned';
 
 test('API con MySQL: autenticación, validaciones, CRUD e historiales', {
     skip: process.env.RUN_INTEGRATION !== '1' ? 'Definí RUN_INTEGRATION=1 y las variables TEST_DB_* para ejecutar contra una base temporal.' : false,
@@ -27,20 +30,50 @@ test('API con MySQL: autenticación, validaciones, CRUD e historiales', {
         });
         const { default: app } = await import('../src/app.js');
         ({ pool } = await import('../src/config/db.js'));
-        server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
-        const base = `http://127.0.0.1:${server.address().port}/api`;
+        const pems = await selfsigned.generate([{ name: 'commonName', value: 'localhost' }], {
+            algorithm: 'sha256',
+            extensions: [
+                { name: 'subjectAltName', altNames: [{ type: 7, ip: '127.0.0.1' }] },
+                { name: 'extKeyUsage', serverAuth: true },
+            ],
+        });
+        server = await new Promise(resolve => {
+            const s = https.createServer({ key: pems.private, cert: pems.cert, minVersion: 'TLSv1.2' }, app)
+                .listen(0, '127.0.0.1', () => resolve(s));
+        });
+        const base = `https://127.0.0.1:${server.address().port}/api`;
         let token, usuarioId, vehiculoId, conductorId, viajeId;
 
-        async function request(ruta, metodo = 'GET', datos, credencial = token) {
-            const respuesta = await fetch(`${base}${ruta}`, {
-                method: metodo, headers: { 'Content-Type': 'application/json', ...(credencial ? { Authorization: `Bearer ${credencial}` } : {}) },
-                ...(datos === undefined ? {} : { body: JSON.stringify(datos) }),
+        function request(ruta, metodo = 'GET', datos, credencial = token, crudo = false) {
+            return new Promise((resolve, reject) => {
+                const solicitud = https.request(`${base}${ruta}`, {
+                    ca: pems.cert,
+                    method: metodo, headers: { 'Content-Type': 'application/json', ...(credencial ? { Authorization: `Bearer ${credencial}` } : {}) },
+                }, respuesta => {
+                    let cuerpo = '';
+                    respuesta.setEncoding('utf8');
+                    respuesta.on('data', parte => { cuerpo += parte; });
+                    respuesta.on('end', () => {
+                        try { resolve({ estado: respuesta.statusCode, datos: cuerpo ? JSON.parse(cuerpo) : null }); }
+                        catch (error) { reject(error); }
+                    });
+                });
+                solicitud.on('error', reject);
+                solicitud.end(datos === undefined ? undefined : crudo ? datos : JSON.stringify(datos));
             });
-            return { estado: respuesta.status, datos: respuesta.status === 204 ? null : await respuesta.json() };
         }
         const vehiculo = { marca: 'Iveco', modelo: 'Daily', patente: 'AB123CD', anio: 2024, capacidad_carga: 3500 };
         const conductor = { nombre: 'Ana', apellido: 'Pérez', documento: '32123456', numero_licencia: 'LR-12345', fecha_alta_licencia: '2024-01-01', fecha_vencimiento_licencia: '2030-12-31' };
 
+        await t.test('HTTPS verifica el certificado y no acepta HTTP', async () => {
+            await assert.rejects(new Promise((resolve, reject) => {
+                https.get(`${base}/salud`, resolve).on('error', reject);
+            }), error => ['DEPTH_ZERO_SELF_SIGNED_CERT', 'SELF_SIGNED_CERT_IN_CHAIN'].includes(error.code));
+            await assert.rejects(new Promise((resolve, reject) => {
+                http.get(base.replace('https:', 'http:') + '/salud', resolve).on('error', reject);
+            }));
+            assert.equal((await request('/salud')).estado, 200);
+        });
         await t.test('CRUD requiere autenticación', async () => {
             for (const ruta of ['/vehiculos', '/conductores', '/viajes']) assert.equal((await request(ruta)).estado, 401);
         });
@@ -112,8 +145,8 @@ test('API con MySQL: autenticación, validaciones, CRUD e historiales', {
             assert.equal((await request(`/viajes/${viajeId}`)).estado, 404);
         });
         await t.test('errores JSON y respuesta 500 sin detalles internos', async () => {
-            const malformado = await fetch(`${base}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{' });
-            assert.equal(malformado.status, 400);
+            const malformado = await request('/auth/login', 'POST', '{', undefined, true);
+            assert.equal(malformado.estado, 400);
             assert.equal((await request('/no-existe')).estado, 404);
             await admin.query('RENAME TABLE vehiculos TO vehiculos_temporal');
             try {

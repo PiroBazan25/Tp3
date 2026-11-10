@@ -1,4 +1,4 @@
-@base = http://127.0.0.1:3000/api
+@base = https://localhost:3000/api
 @token = {{login.response.body.$.token}}
 @vehiculo = {{crearVehiculo.response.body.$.id}}
 @conductor = {{crearConductor.response.body.$.id}}

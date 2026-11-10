@@ -40,6 +40,7 @@ Crear la base y las tablas:
 
 ```sh
 npm run db:init
+npm run cert:crear
 npm run dev
 ```
 
@@ -47,7 +48,7 @@ El script utiliza `DB_NAME` y ejecuta `backend/sql/tablas.sql`. No borra tablas 
 El usuario de MySQL debe poder crear la base y las tablas; también se puede preparar
 la base con un administrador y configurar un usuario con permisos limitados para la API.
 
-El backend usa el puerto 3000. El archivo SQL también puede ejecutarse manualmente
+El backend usa HTTPS en el puerto 3000. El archivo SQL también puede ejecutarse manualmente
 desde una conexión a la base elegida en MySQL Workbench o DBeaver.
 
 ### 2. Iniciar el frontend
@@ -59,12 +60,28 @@ npm install
 npm run dev
 ```
 
-Abrir la dirección que muestra Vite, normalmente `http://localhost:5173`.
-Vite redirige `/api` al backend en `http://127.0.0.1:3000` mediante su proxy.
+Abrir la dirección HTTPS que muestra Vite, normalmente `https://127.0.0.1:5173`.
+Vite redirige `/api` al backend en `https://127.0.0.1:3000` mediante su proxy.
 Si se cambia el puerto del backend, actualizar también `frontend/vite.config.js`.
 
 Una vez instaladas las dependencias y configurado MySQL, también se pueden iniciar
 ambos servidores desde **Terminal > Ejecutar tarea > Iniciar TP3** en VS Code.
+
+### Certificado de desarrollo
+
+`npm run cert:crear` genera un certificado para `localhost` y `127.0.0.1`, con una
+clave propia para este equipo. Los guarda en `certs`, fuera de Git. Si ya existen,
+el script no los reemplaza. No instala certificados ni cambia la configuración del sistema.
+
+El certificado es autofirmado: el navegador o REST Client pueden mostrar un aviso
+de confianza. Para trabajar sin ese aviso, configurar un certificado local confiable
+con ayuda del docente o del administrador del equipo. No desactivar la validación
+SSL del navegador ni de REST Client. En Vite y Express se usan por defecto los
+archivos `certs/localhost.pem` y `certs/localhost-key.pem`.
+
+El backend también admite `TLS_CERT_PATH` y `TLS_KEY_PATH` para certificados propios.
+El proxy de Vite verifica el certificado del backend; no usa `secure: false`.
+La compilación del frontend no necesita los certificados privados.
 
 ## Uso
 
@@ -140,12 +157,12 @@ o tokens inválidos, 403 para una cuenta que ya no existe aunque el token sea v�
 - El token se guarda en sessionStorage y se elimina al cerrar sesión. No se persisten contraseñas.
 - Las consultas utilizan parámetros y las rutas protegidas verifican la autenticación en el servidor.
 - Los valores de campos sensibles no se incluyen en los errores de validación.
-- `.env`, `node_modules` y `dist` están excluidos de Git.
+- `.env`, `certs`, `node_modules` y `dist` están excluidos de Git.
 
-En desarrollo se usa HTTP únicamente sobre loopback. Si se despliega en otro equipo o
-en Internet, se debe usar HTTPS: bcrypt protege el almacenamiento, pero no cifra el
-tránsito de la contraseña durante registro o login. No basta con hacer un hash en el navegador.
-La configuración de hosting y HTTPS queda fuera de este entorno local.
+El frontend y el backend se sirven por HTTPS. El cliente bloquea las solicitudes si
+se abre desde HTTP. Las contraseñas viajan dentro de TLS y se guardan con bcrypt;
+no se registran en logs ni se devuelven en respuestas. Para un despliegue en Internet,
+usar un certificado válido emitido para el dominio. No subir claves privadas al repositorio.
 
 ## Pruebas
 
@@ -176,6 +193,8 @@ npm test
 Sin `RUN_INTEGRATION=1`, la prueba se omite explícitamente. Las pruebas cubren registro,
 hash de contraseñas, duración y rechazo de JWT, acceso protegido, validaciones, CRUD,
 relaciones, filtros, kilómetros y respuestas de error.
+También se verifica que la API responda con un certificado confiado explícitamente
+por la prueba, que el cliente rechace un certificado no confiado y que la API no acepte HTTP.
 
 ## Entrega en GitHub
 
