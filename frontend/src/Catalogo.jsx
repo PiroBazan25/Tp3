@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import { api } from '../services/api.js';
-import Formulario from '../components/Formulario.jsx';
+import { useAuth } from './Auth.jsx';
+import { api } from './api.js';
+import Formulario from './Formulario.jsx';
 
 const configuraciones = {
     vehiculos: {

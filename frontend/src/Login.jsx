@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import { api } from '../services/api.js';
+import { useAuth } from './Auth.jsx';
+import { api } from './api.js';
 
-export default function Acceso({ registro = false }) {
+export default function Login({ registro = false }) {
     const { usuario, iniciarSesion, error: errorSesion } = useAuth();
     const [error, setError] = useState('');
     const [enviando, setEnviando] = useState(false);

@@ -123,14 +123,23 @@ backend/
   test/api.test.js       Pruebas de integración
 frontend/
   src/
-    components/         Layout y formulario reutilizable
-    context/            Estado de sesión
-    pages/              Inicio, acceso, catálogos y viajes
-    services/           Cliente fetch
+    main.jsx            Entrada y rutas de React
+    Auth.jsx            Contexto de autenticación
+    AuthLayout.jsx      Protección de páginas privadas
+    Layout.jsx          Navegación y estructura de la página
+    Home.jsx            Página pública
+    Login.jsx           Inicio de sesión y registro
+    Vehiculos.jsx       Página de vehículos
+    Conductores.jsx     Página de conductores
+    Catalogo.jsx        Listado y edición de vehículos y conductores
+    Viajes.jsx          Registro e historial de viajes
+    Formulario.jsx      Campos y acciones de formularios
+    api.js              Comunicación mediante fetch
+    index.css           Estilos
 ```
 
-El backend sigue la organización por archivos del ejemplo de la clase del 6 de noviembre:
-[repositorio de las clases](https://github.com/mfpuentear/tup-programacion-IV-2026/tree/master/2026-11-06).
+La organización sigue los [ejemplos de la clase del 6 de noviembre](https://github.com/mfpuentear/tup-programacion-IV-2026/tree/master/2026-11-06): archivos por recurso
+en la raíz del backend y componentes directamente en `src` en el frontend.
 Se mantienen las carpetas `backend` y `frontend` que solicita la consigna del TP3.
 
 ## API

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { api } from '../services/api.js';
-import { useAuth } from '../context/AuthContext.jsx';
-import Formulario from '../components/Formulario.jsx';
+import { api } from './api.js';
+import { useAuth } from './Auth.jsx';
+import Formulario from './Formulario.jsx';
 
 export default function Viajes() {
     const { token } = useAuth();
