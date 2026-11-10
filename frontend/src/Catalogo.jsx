@@ -10,7 +10,7 @@ const configuraciones = {
         campos: [
             { nombre: 'marca', etiqueta: 'Marca', maxLength: 80 },
             { nombre: 'modelo', etiqueta: 'Modelo', maxLength: 80 },
-            { nombre: 'patente', etiqueta: 'Patente', minLength: 3, maxLength: 15, pattern: '[A-Za-z0-9 -]{3,15}' },
+            { nombre: 'patente', etiqueta: 'Patente', minLength: 3, maxLength: 15, pattern: '[A-Za-z0-9 \\-]{3,15}' },
             { nombre: 'anio', etiqueta: 'Año', tipo: 'number', min: 1900, max: new Date().getFullYear() + 1, step: 1 },
             { nombre: 'capacidad_carga', etiqueta: 'Capacidad de carga (kg)', tipo: 'number', min: 0.01, max: 9999999999.99, step: '0.01' },
         ],
