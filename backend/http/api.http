@@ -1,0 +1,184 @@
+@base = http://127.0.0.1:3000/api
+@token = {{login.response.body.$.token}}
+@vehiculo = {{crearVehiculo.response.body.$.id}}
+@conductor = {{crearConductor.response.body.$.id}}
+@viaje = {{crearViaje.response.body.$.id}}
+
+### Estado público de la API
+GET {{base}}/salud
+
+### 1. Registrar usuario (cambiar el email si ya existe)
+POST {{base}}/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Usuario de prueba",
+  "email": "prueba@example.com",
+  "contrasena": "Prueba123!"
+}
+
+### 2. Iniciar sesión. Las solicitudes siguientes usan este token.
+# @name login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "prueba@example.com",
+  "contrasena": "Prueba123!"
+}
+
+### Usuario autenticado
+GET {{base}}/auth/yo
+Authorization: Bearer {{token}}
+
+### 3. Agregar vehículo
+# @name crearVehiculo
+POST {{base}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Iveco",
+  "modelo": "Daily",
+  "patente": "AB123CD",
+  "anio": 2024,
+  "capacidad_carga": 3500
+}
+
+### Listar vehículos (buscar es opcional)
+GET {{base}}/vehiculos?buscar=Iveco
+Authorization: Bearer {{token}}
+
+### Obtener vehículo
+GET {{base}}/vehiculos/{{vehiculo}}
+Authorization: Bearer {{token}}
+
+### Modificar vehículo
+PUT {{base}}/vehiculos/{{vehiculo}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "marca": "Iveco",
+  "modelo": "Daily 70",
+  "patente": "AB123CD",
+  "anio": 2024,
+  "capacidad_carga": 4000
+}
+
+### 4. Agregar conductor
+# @name crearConductor
+POST {{base}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Pérez",
+  "documento": "32123456",
+  "numero_licencia": "LR-12345",
+  "fecha_alta_licencia": "2024-01-01",
+  "fecha_vencimiento_licencia": "2030-12-31"
+}
+
+### Listar conductores
+GET {{base}}/conductores?buscar=Ana
+Authorization: Bearer {{token}}
+
+### Obtener conductor
+GET {{base}}/conductores/{{conductor}}
+Authorization: Bearer {{token}}
+
+### Modificar conductor
+PUT {{base}}/conductores/{{conductor}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Ana María",
+  "apellido": "Pérez",
+  "documento": "32123456",
+  "numero_licencia": "LR-12345",
+  "fecha_alta_licencia": "2024-01-01",
+  "fecha_vencimiento_licencia": "2030-12-31"
+}
+
+### 5. Registrar viaje
+# @name crearViaje
+POST {{base}}/viajes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": {{vehiculo}},
+  "conductor_id": {{conductor}},
+  "fecha_salida": "2026-11-10T08:00",
+  "fecha_llegada": "2026-11-10T12:00",
+  "origen": "La Rioja",
+  "destino": "Chilecito",
+  "kilometros": 200.5,
+  "observaciones": "Entrega de mercadería"
+}
+
+### Listar todos los viajes y el total de kilómetros
+GET {{base}}/viajes
+Authorization: Bearer {{token}}
+
+### Historial por vehículo
+GET {{base}}/viajes?vehiculo_id={{vehiculo}}
+Authorization: Bearer {{token}}
+
+### Historial por conductor
+GET {{base}}/viajes?conductor_id={{conductor}}
+Authorization: Bearer {{token}}
+
+### Historial por vehículo y conductor
+GET {{base}}/viajes?vehiculo_id={{vehiculo}}&conductor_id={{conductor}}
+Authorization: Bearer {{token}}
+
+### Obtener viaje
+GET {{base}}/viajes/{{viaje}}
+Authorization: Bearer {{token}}
+
+### Modificar viaje
+PUT {{base}}/viajes/{{viaje}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehiculo_id": {{vehiculo}},
+  "conductor_id": {{conductor}},
+  "fecha_salida": "2026-11-10T08:00",
+  "fecha_llegada": "2026-11-10T12:30",
+  "origen": "La Rioja",
+  "destino": "Chilecito",
+  "kilometros": 210.75,
+  "observaciones": "Recorrido corregido"
+}
+
+### Error esperado: 401 por falta de token
+GET {{base}}/vehiculos
+
+### Error esperado: 400 por ID inválido
+GET {{base}}/vehiculos/abc
+Authorization: Bearer {{token}}
+
+### Error esperado: 404 por registro inexistente
+GET {{base}}/vehiculos/4294967295
+Authorization: Bearer {{token}}
+
+### Error esperado: 400 al borrar un vehículo con viajes
+DELETE {{base}}/vehiculos/{{vehiculo}}
+Authorization: Bearer {{token}}
+
+### 6. Eliminar primero el viaje
+DELETE {{base}}/viajes/{{viaje}}
+Authorization: Bearer {{token}}
+
+### 7. Eliminar vehículo (sin viajes)
+DELETE {{base}}/vehiculos/{{vehiculo}}
+Authorization: Bearer {{token}}
+
+### 8. Eliminar conductor (sin viajes)
+DELETE {{base}}/conductores/{{conductor}}
+Authorization: Bearer {{token}}

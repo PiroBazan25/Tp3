@@ -1,0 +1,24 @@
+import express from 'express';
+import cors from 'cors';
+import { config } from './config/env.js';
+import passport from './config/passport.js';
+import auth from './routes/auth.js';
+import vehiculos from './routes/vehiculos.js';
+import conductores from './routes/conductores.js';
+import viajes from './routes/viajes.js';
+import { autenticar } from './middlewares/autenticacion.js';
+import { manejarErrores } from './middlewares/errores.js';
+
+const app = express();
+app.disable('x-powered-by');
+app.use(cors({ origin: config.frontendUrl }));
+app.use(express.json({ limit: '20kb' }));
+app.use(passport.initialize());
+app.get('/api/salud', (req, res) => res.json({ mensaje: 'API de transporte disponible.' }));
+app.use('/api/auth', auth);
+app.use('/api/vehiculos', autenticar, vehiculos);
+app.use('/api/conductores', autenticar, conductores);
+app.use('/api/viajes', autenticar, viajes);
+app.use((req, res) => res.status(404).json({ mensaje: 'Ruta no encontrada.' }));
+app.use(manejarErrores);
+export default app;
