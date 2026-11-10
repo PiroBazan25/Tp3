@@ -21,15 +21,15 @@ test('API con MySQL: autenticación, validaciones, CRUD e historiales', {
     try {
         await admin.query(`CREATE DATABASE \`${dbName}\` CHARACTER SET utf8mb4`);
         await admin.changeUser({ database: dbName });
-        const sql = await readFile(new URL('../sql/tablas.sql', import.meta.url), 'utf8');
+        const sql = await readFile(new URL('../tablas.sql', import.meta.url), 'utf8');
         for (const sentencia of sql.split(';').map(s => s.trim()).filter(Boolean)) await admin.query(sentencia);
         Object.assign(process.env, {
             DB_HOST: process.env.TEST_DB_HOST || '127.0.0.1', DB_PORT: process.env.TEST_DB_PORT || '3306',
             DB_USER: process.env.TEST_DB_USER || 'root', DB_PASSWORD: process.env.TEST_DB_PASSWORD || '',
             DB_NAME: dbName, JWT_SECRET: randomBytes(48).toString('hex'),
         });
-        const { default: app } = await import('../src/app.js');
-        ({ pool } = await import('../src/config/db.js'));
+        const { default: app } = await import('../app.js');
+        ({ pool } = await import('../db.js'));
         const pems = await selfsigned.generate([{ name: 'commonName', value: 'localhost' }], {
             algorithm: 'sha256',
             extensions: [

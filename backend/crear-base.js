@@ -15,7 +15,7 @@ const conexion = await mysql.createConnection({
 try {
     await conexion.query(`CREATE DATABASE IF NOT EXISTS \`${nombre}\` CHARACTER SET utf8mb4`);
     await conexion.changeUser({ database: nombre });
-    const sql = await readFile(new URL('../sql/tablas.sql', import.meta.url), 'utf8');
+    const sql = await readFile(new URL('./tablas.sql', import.meta.url), 'utf8');
     for (const sentencia of sql.split(';').map(s => s.trim()).filter(Boolean)) {
         await conexion.query(sentencia);
     }

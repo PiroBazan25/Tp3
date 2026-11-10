@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
-    "db:init": "node scripts/crear-base.js",
-    "cert:crear": "node scripts/crear-certificado.js",
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "db:init": "node crear-base.js",
+    "cert:crear": "node crear-certificado.js",
     "test": "node --test"
   },
   "dependencies": {

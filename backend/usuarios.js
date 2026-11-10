@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool } from './db.js';
 
 export async function buscarPorEmail(email) {
     const [filas] = await pool.execute('SELECT id, nombre, email, contrasena FROM usuarios WHERE email = ?', [email]);

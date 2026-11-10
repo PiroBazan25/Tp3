@@ -1,13 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import { config } from './config/env.js';
-import passport from './config/passport.js';
-import auth from './routes/auth.js';
-import vehiculos from './routes/vehiculos.js';
-import conductores from './routes/conductores.js';
-import viajes from './routes/viajes.js';
-import { autenticar } from './middlewares/autenticacion.js';
-import { manejarErrores } from './middlewares/errores.js';
+import { config } from './env.js';
+import auth, { autenticar, passport } from './auth.js';
+import vehiculos from './vehiculos.js';
+import conductores from './conductores.js';
+import viajes from './viajes.js';
+import { manejarErrores } from './errores.js';
 
 const app = express();
 app.disable('x-powered-by');

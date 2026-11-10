@@ -1,7 +1,7 @@
 import { mkdir, writeFile, access } from 'node:fs/promises';
 import selfsigned from 'selfsigned';
 
-const carpeta = new URL('../../certs/', import.meta.url);
+const carpeta = new URL('../certs/', import.meta.url);
 const clave = new URL('localhost-key.pem', carpeta);
 const certificado = new URL('localhost.pem', carpeta);
 

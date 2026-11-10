@@ -1,8 +1,8 @@
 import app from './app.js';
-import { pool } from './config/db.js';
-import { config } from './config/env.js';
+import { pool } from './db.js';
+import { config } from './env.js';
 import { createServer } from 'node:https';
-import { leerTls } from './config/tls.js';
+import { leerTls } from './tls.js';
 
 try {
     const tls = leerTls();

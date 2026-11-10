@@ -44,7 +44,7 @@ npm run cert:crear
 npm run dev
 ```
 
-El script utiliza `DB_NAME` y ejecuta `backend/sql/tablas.sql`. No borra tablas existentes.
+El script utiliza `DB_NAME` y ejecuta `backend/tablas.sql`. No borra tablas existentes.
 El usuario de MySQL debe poder crear la base y las tablas; también se puede preparar
 la base con un administrador y configurar un usuario con permisos limitados para la API.
 
@@ -104,17 +104,22 @@ no define roles ni empresas separadas.
 
 ```text
 backend/
-  http/api.http          Pruebas manuales de la API
-  scripts/crear-base.js  Creación de base y tablas
-  sql/tablas.sql         Definiciones y relaciones
-  src/
-    config/             Conexión, entorno y estrategia Passport
-    controllers/        Operaciones de cada recurso
-    middlewares/        Autenticación, validaciones y errores
-    models/             Consultas parametrizadas a MySQL
-    routes/             Rutas REST
-    app.js              Configuración de Express
-    server.js           Inicio del servidor
+  index.js              Inicio del servidor HTTPS
+  app.js                Configuración de Express y rutas
+  db.js                 Conexión a MySQL
+  auth.js               Registro, login y Passport JWT
+  usuarios.js           Consultas de usuarios
+  vehiculos.js          Rutas y consultas de vehículos
+  conductores.js        Rutas y consultas de conductores
+  viajes.js             Rutas, consultas e historial de viajes
+  validaciones.js       Validaciones de datos
+  errores.js            Respuestas de error
+  env.js                Configuración de entorno
+  tls.js                Lectura del certificado HTTPS
+  crear-base.js         Creación de base y tablas
+  crear-certificado.js  Certificado local de desarrollo
+  tablas.sql            Definiciones y relaciones
+  api.http              Pruebas manuales de la API
   test/api.test.js       Pruebas de integración
 frontend/
   src/
@@ -124,7 +129,9 @@ frontend/
     services/           Cliente fetch
 ```
 
-La estructura está pendiente de comparar con el repositorio de las clases cuando esté disponible.
+El backend sigue la organización por archivos del ejemplo de la clase del 6 de noviembre:
+[repositorio de las clases](https://github.com/mfpuentear/tup-programacion-IV-2026/tree/master/2026-11-06).
+Se mantienen las carpetas `backend` y `frontend` que solicita la consigna del TP3.
 
 ## API
 
@@ -166,7 +173,7 @@ usar un certificado válido emitido para el dominio. No subir claves privadas al
 
 ## Pruebas
 
-Con la extensión REST Client de VS Code se puede abrir `backend/http/api.http`
+Con la extensión REST Client de VS Code se puede abrir `backend/api.http`
 y ejecutar las solicitudes en orden. Los ejemplos crean registros de prueba que
 pueden borrarse usando las últimas solicitudes del archivo.
 
