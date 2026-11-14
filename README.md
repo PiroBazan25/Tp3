@@ -1,44 +1,25 @@
 # TP3 - Gestión de transporte
 
-Este trabajo práctico es un sistema para registrar vehículos, conductores y viajes de una empresa. Se puede crear una cuenta, iniciar sesión y consultar cuántos kilómetros se recorrieron por vehículo o por conductor.
+El proyecto parte de una situación común en una empresa de transporte. Hace falta saber qué vehículos están disponibles, quién puede manejarlos y qué recorridos se hicieron. La aplicación reúne esos datos y permite consultar cuántos kilómetros hizo cada vehículo o conductor.
 
-El frontend está hecho con React y Vite. El backend usa Express y guarda los datos en MySQL.
+Desde la pantalla de inicio se puede crear una cuenta o ingresar con una existente. Una vez iniciada la sesión, se pueden cargar, editar y eliminar vehículos y conductores. En cada viaje se elige un vehículo y un conductor, y se anotan el origen, el destino, las fechas, los kilómetros y cualquier observación que haga falta.
 
-## Cómo levantarlo
+## Cómo se relacionan los datos
 
-Abrí la carpeta del proyecto en VS Code. Necesitás Node.js 22.12 o superior y MySQL 8 o superior en ejecución.
+Para registrar un viaje, el vehículo y el conductor ya tienen que estar cargados. La licencia debe estar vigente tanto al salir como al llegar. Si un vehículo o un conductor tiene viajes asociados, el sistema avisa antes de eliminarlo y conserva el historial.
 
-**Backend.** Desde la carpeta `backend`, instalá las dependencias con `npm ci`. Copiá `.env.example` como `.env` y completá los datos de conexión a MySQL. Para generar el valor de `JWT_SECRET`, podés usar este comando y pegar el resultado en el archivo.
+En la pantalla de viajes se puede filtrar por vehículo, por conductor o por los dos juntos. El total de kilómetros se calcula con los viajes que quedan en ese filtro. Por ejemplo, si un vehículo tiene dos viajes de 80 y 120 km, al seleccionarlo el historial muestra 200 km. Si el filtro de conductor deja solo uno de esos viajes, el total se actualiza.
 
-```sh
-node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-```
+## Organización del proyecto
 
-Después ejecutá estos comandos en la misma terminal.
+El frontend está hecho con React, Vite y CSS. Los componentes están en `frontend/src` y usan `fetch` para comunicarse con la API de Express. En `backend` hay un archivo por recurso, junto con la conexión a MySQL y las validaciones. Para ordenar las carpetas se siguió el ejemplo de la clase del 6 de noviembre. [Repositorio de la clase](https://github.com/mfpuentear/tup-programacion-IV-2026/tree/master/2026-11-06)
 
-```sh
-npm run db:init
-npm run cert:crear
-npm run dev
-```
+MySQL guarda los usuarios, los vehículos, los conductores y los viajes. Las contraseñas se guardan como hashes de bcrypt. Al iniciar sesión, el servidor devuelve un token JWT que dura cuatro horas. Passport lo verifica antes de permitir el acceso a las rutas privadas. La comunicación entre el navegador y la API usa HTTPS.
 
-El primer comando crea la base y las tablas que están en `backend/tablas.sql`. Usá una cuenta de MySQL con permisos para crearlas. El segundo genera los certificados locales para HTTPS.
+## Para correrlo en local
 
-**Frontend.** Dejá el backend andando y abrí otra terminal en `frontend`.
+Se necesita Node.js 22.12 o superior y MySQL 8 en funcionamiento. Las dependencias se instalan con `npm ci` dentro de `backend` y `frontend`. El backend usa un archivo `.env` basado en `backend/.env.example`, con los datos de MySQL y un `JWT_SECRET` propio. El archivo de ejemplo incluye un comando para generar ese secreto.
 
-```sh
-npm ci
-npm run dev
-```
+Desde `backend`, `npm run db:init` crea la base y las tablas con `tablas.sql`, y `npm run cert:crear` genera los certificados para HTTPS local. Cada parte se inicia con `npm run dev` en su carpeta. La aplicación se abre en la dirección HTTPS que muestra Vite. El navegador puede pedir que se configure el certificado local como confiable.
 
-Entrá a la dirección HTTPS que muestra Vite. Como el certificado de desarrollo es autofirmado, el navegador puede pedir que lo configures como confiable en tu equipo.
-
-## Cómo probarlo
-
-Creá una cuenta y cargá un vehículo y un conductor con licencia vigente. Después registrá un viaje con esos datos. En el historial podés filtrar por vehículo o conductor y ver el total de kilómetros de los viajes que coincidan.
-
-Para probar las rutas por separado, abrí `backend/api.http` con REST Client en VS Code. Registrá un usuario e iniciá sesión antes de ejecutar las solicitudes que usan el token.
-
-Las contraseñas se guardan con **bcrypt** y las rutas privadas se protegen con **Passport y JWT**. El token vence a las cuatro horas. Cada instalación usa su propio `.env` y sus propios certificados.
-
-La estructura sigue los ejemplos de la clase del 6 de noviembre. [Repositorio de las clases](https://github.com/mfpuentear/tup-programacion-IV-2026/tree/master/2026-11-06)
+El archivo `backend/api.http` tiene solicitudes de ejemplo para probar el registro, el inicio de sesión y las operaciones de la API desde REST Client en VS Code.
