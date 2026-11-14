@@ -1,12 +1,12 @@
 # TP3 - Gestión de transporte
 
-El proyecto parte de una situación común en una empresa de transporte. Hace falta saber qué vehículos están disponibles, quién puede manejarlos y qué recorridos se hicieron. La aplicación reúne esos datos y permite consultar cuántos kilómetros hizo cada vehículo o conductor.
+El proyecto parte de una situación común en una empresa de transporte. Hace falta saber qué vehículos tiene la empresa, quién puede manejarlos y qué recorridos se hicieron. La aplicación reúne esos datos y permite consultar cuántos kilómetros hizo cada vehículo o conductor.
 
 Desde la pantalla de inicio se puede crear una cuenta o ingresar con una existente. Una vez iniciada la sesión, se pueden cargar, editar y eliminar vehículos y conductores. En cada viaje se elige un vehículo y un conductor, y se anotan el origen, el destino, las fechas, los kilómetros y cualquier observación que haga falta.
 
 ## Cómo se relacionan los datos
 
-Para registrar un viaje, el vehículo y el conductor ya tienen que estar cargados. La licencia debe estar vigente tanto al salir como al llegar. Si un vehículo o un conductor tiene viajes asociados, el sistema avisa antes de eliminarlo y conserva el historial.
+Para registrar un viaje, el vehículo y el conductor ya tienen que estar cargados. La licencia debe estar vigente tanto al salir como al llegar. Si un vehículo o un conductor tiene viajes asociados, el sistema impide eliminarlo para conservar el historial.
 
 En la pantalla de viajes se puede filtrar por vehículo, por conductor o por los dos juntos. El total de kilómetros se calcula con los viajes que quedan en ese filtro. Por ejemplo, si un vehículo tiene dos viajes de 80 y 120 km, al seleccionarlo el historial muestra 200 km. Si el filtro de conductor deja solo uno de esos viajes, el total se actualiza.
 
